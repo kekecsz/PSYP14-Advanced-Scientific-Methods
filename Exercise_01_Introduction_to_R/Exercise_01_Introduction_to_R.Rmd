@@ -3,10 +3,10 @@ title: "Introduction to R"
 author: "Zoltan Kekecs, Marton Kovacs"
 date: "November 02, 2020"
 output:
-  html_document:
+  pdf_document:
     number_sections: yes
     toc: yes
-  pdf_document:
+  html_document:
     number_sections: yes
     toc: yes
   word_document:
