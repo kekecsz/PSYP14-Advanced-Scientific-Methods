@@ -1,6 +1,7 @@
 ###########################################################
 #                  Introduction to R	                    #
 ###########################################################
+
 # ## Abstrakt	
 
 # This is an intorduction to the use of the R software. This exercise demonstrates the basic functionalities of R, and the use of the consol and the script fields. It will also inform about different different types of data in R, such as vectors, matrices, and data frames, and shows some basic functions used for data management.	
