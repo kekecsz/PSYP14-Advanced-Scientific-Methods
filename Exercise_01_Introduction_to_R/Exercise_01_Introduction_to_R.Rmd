@@ -3,10 +3,10 @@ title: "Introduction to R"
 author: "Zoltan Kekecs, Marton Kovacs"
 date: "November 02, 2020"
 output:
-  pdf_document:
+  html_document:
     number_sections: yes
     toc: yes
-  html_document:
+  pdf_document:
     number_sections: yes
     toc: yes
   word_document:
@@ -56,11 +56,11 @@ Some of the language is similar to that used in mathematics. For example writing
 
 # Script
 
-If we  wanted, we could type every one of our commands directly in the console, and read the results subsequently. But this would make it very hard to see it clearly what we did, partly because the code would be riddled with the results (which sometimes can be very long outputs), and partly because the console has a capacity (number of rows) beyond which old commands and results are no longer kept, and are deleted.
+If we  wanted, we could type every one of our commands directly in the console, and read the results subsequently. But this would make it very hard to see it clearly what we did, partly because the code would be riddled with the results (which sometimes can be very long outputs), and partly because the **console has a capacity** (number of rows) beyond which old commands and results are no longer kept, and are deleted.
 
-Thus, instead of using the console to type our code, we usually use a text editor to plan, and write code, and to keep our code organized. This text containing our code is called the script (because it is acin to the script of a screenplay which will later be "enacted" by the console), and we can use the built-in script editor in R and RStudio to write it. So we write our script first, and when we are satisfied with it, we run the code in the script later in the console.
+Thus, instead of using the console to type our code, we usually use a **text editor** to plan, and write code, and to keep our code organized. This text containing our code is called the script (because it is acin to the **script** of a screenplay which will later be "enacted" by the console), and we can use the built-in script editor in R and RStudio to write it. So we write our script first, and when we are satisfied with it, we run the code in the script later in the console.
 
-The script editor is usually in the top left panel in R studio. When you first open R and RStudio you sometimes only see the console takine up all the left side, and you will have to open a new script window in *File > New file > R script*.
+The script editor is usually in the top left panel in R studio. When you first open R and RStudio you sometimes only see the console takine up all the left side, and you will have to open a new script window in **File > New file > R script**.
 
 Now open a script window and type some commands in it. E.g..:
 
@@ -76,19 +76,47 @@ An even faster apporach is to simply click anywhere in the line of code we want 
 
 Now try the following: type 3 mathematical operations in the script editor in separate lines. Now click anywhere within the first line, and press  *Ctrl + ENTER* multiple times. You should see that the commands are run in the console one after the other as they follow each other in the script.
 
-# Finished and unfinished commands
+# Errors and other issues
 
-Now try to run the following script:
+## Red messages
+
+Problems in R code are often associated with red messages apearing in R. Not all red messages are the same.
+
+**Error messages** apear when the code that you wanted to run was uninterpretable by R and thus the code ended without success or result. A common error is the *object not found* error message, where R could not find a particular object we referred to in the code (we will talk about objects later). E.g.
+
+```{r Error, eval = F}
+therewillbeanerrorhere
+```
+
+**Warning messages** are warnings that follow code that did run, but some unusual or potentially problematic issue was detected. A common warning message is what we get when we load a package that was designed for a *newer version of R*. Or we can get warning messages when plotting graphs and some of the elements are *out of bound* of the plot and cannot be displayed. This is how Warning messages look like:
+
+```{r Warning}
+fw <- function() {
+  warning("This is an exaple warning message")
+}
+
+fw()
+```
+
+**Messages** are built in *notifications* in R functions. They often are often not associated with errors or issues, they are there as reminders or to direct attention to something. For example we often get messages when we install or *load packages* (we will talk about these later in the course), and they want to let us know the package versions, other packages that are loaded to make this package work, and functions that work differently in this package compared to other packages. E.g.
+
+```{r Message, eval = F}
+install.packages("tidyverse")
+library(tidyverse)
+```
+
+**Unfinished code issue**: There are other types of issues that are less intuitive to detect. For example the *Unfinished code* issue.
+Try to run the following script:
 
 ```{r codesegment, eval = F}
 9 / 3 + 6 *
 ```
 
-Note that this is a command-fragment. This is an unfinished mathematical operation, since we did not write anything after the "*". Now if you look in the console you should see that instead of the familiar ">" sign in the end of the console lines, you see a "+" sign. This means that R is waiting for the commmand to be finished. It needs some more information to be able to run the command. 
+Note that this is a *command-fragment*. This is an unfinished mathematical operation, since we did not write anything after the "*". Now if you look in the console you should see that instead of the familiar ">" sign in the end of the console lines, you see a "+" sign. This means that R is waiting for the commmand to be finished. It needs some more information to be able to run the command. 
 
-It is common, especially in the early learning stage of using R to accidentally run command fragments without realizing it. This will manifest in a way that you will not get the desired results/output, rather, you will just see the command line with this "+" sign growing and growing as you try to run new code, without ever returning a result. This is likely due to an unclosed parenthesis somewhere in your code. Usually the best way to stop this cycle is to just put a ")" in the console and running it with ENTER, which will end the command, and likely produce an error, but at least you can now resume running code again and get results.
+It is common, especially in the early learning stage of using R to accidentally run command fragments without realizing it. This will manifest in a way that you will not get the desired results/output, rather, you will just see the command line with this "+" sign growing and growing as you try to run new code, without ever returning a result. This is likely due to an unclosed parenthesis somewhere in your code. Usually the best way to stop this cycle is to just **put a ")" in the console** and running it with ENTER, which will end the command, and likely produce an error, but at least you can now resume running code again and get results.
 
-If you are not sure what was the result of your script that was run and you want to revert it, you can start over. There are multiple ways for doing this, one way is to clear the work environment (but note that this will not affect the packages you loaded), or to close R without sawing the workspace image and start it again.
+If you are not sure what was the result of your script that was run and you want to revert it, you can **start over**. There are multiple ways for doing this, one way is to clear the work environment (but note that this will not affect the packages you loaded), or to close R without sawing the workspace image and start it again.
 
 # Functions
 
@@ -100,7 +128,7 @@ For example the function to get the logarithm of a number with a base 10 is "log
 log(2)
 ```
 
-We will meet a lot of functions druing this course. 
+We will meet a lot of functions during this course. 
 
 We can even create our own functions (you can find great videos about this on the web), but most functions required for this course are built in in either base R or some of it's official packages.
 
