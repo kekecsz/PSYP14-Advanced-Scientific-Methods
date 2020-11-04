@@ -80,8 +80,10 @@ tail(USArrests, 10)
 # 	
 # The first method is by using **the $ sign** as in the following example. This leads to a clean code, but it doesn't have a lot of versitility when it comes to referencing multiple variables or rows.	
 # 	
-# 	
-USArrests$Murder	
+# 
+
+USArrests$Murder
+
 class(USArrests$Murder)	
 is.vector(USArrests$Murder)	
 
@@ -178,13 +180,14 @@ x <- c(55:120, 984, 552, 17, 650)
 # 	
 # 	
 # 	
+
 round(log(mean(x)), digits = 1) # base R	
 
 # the same with tidyverse pipes	
 x %>%	
   mean() %>%	
-  log() %>% 	
-  round(digits = 1)	
+    log() %>% 	
+      round(digits = 1)	
 
 
 # 	
@@ -260,6 +263,8 @@ x %>%
 # 	
 ToothGrowth %>%	
   filter(supp == "OJ")	
+
+
 # 	
 # 	
 # **mutate()**: Tooth length is in millimeters now in len. Lets create a new variable where the same data is present but converted to centimeters.	
@@ -378,6 +383,7 @@ ToothGrowth %>%
 # **recode()**: recode is used to recode descrete variables into descrete variables. See an example below:	
 # 	
 # 	
+
 ToothGrowth %>% 	
   mutate(dose_recode = recode(dose, 	
                               "0.5" = "small",	
@@ -390,8 +396,8 @@ ToothGrowth %>%
 # 	
 # 	
 ToothGrowth %>% 	
-  mutate(dose_descriptive = case_when(dose == 0.5 ~ "small",	
-                                      dose > 0.5 ~ "medium_to_large"))	
+  mutate(len_new = case_when(len <= 10 ~ "small",	
+                                      len > 10 ~ "medium_to_large"))	
 # 	
 # 	
 # 	

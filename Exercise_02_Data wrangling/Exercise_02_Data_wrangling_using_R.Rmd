@@ -3,10 +3,10 @@ title: "Data wrangling"
 author: "Zoltan Kekecs, Marton Kovacs"
 date: "November 03, 2020"
 output:
-  pdf_document:
+  html_document:
     number_sections: yes
     toc: yes
-  html_document:
+  pdf_document:
     number_sections: yes
     toc: yes
   word_document:
@@ -99,16 +99,19 @@ The first method is by using **the $ sign** as in the following example. This le
 
 ```{r subsetting 1}
 USArrests$Murder
+
 class(USArrests$Murder)
 is.vector(USArrests$Murder)
 
 mean(USArrests$Murder)
 
 ```
+
 The second method is called **subsetting with brackets**. Here we put brackets after the object name, and we specify the rowns and or columns we want to access within the brackets. The following code does the same thing that we did with the $ operator.
 
 ```{r subsetting 2}
 USArrests[,"Murder"]
+
 class(USArrests[,"Murder"])
 is.vector(USArrests[,"Murder"])
 
