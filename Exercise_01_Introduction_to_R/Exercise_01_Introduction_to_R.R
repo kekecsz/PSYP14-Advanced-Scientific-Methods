@@ -122,6 +122,7 @@ log(2)
 
 dreamcar <- "Tesla model S"	
 
+dreamcar
 
 # From now on, everytime we write dreamcar, R knows that we refer to "Tesla model S" during this R session. This is erased once you close the R session or once you clear the workspace, unless you save the workspace. (I generally do not recommend saving the worksapce at quitting R to avoid earlier code creating issue in later code, unless you really know what you are doing.)	
 
@@ -208,13 +209,13 @@ library(gsheet)
 # Now you that the package is installed and loaded, the function can be used: 	
 
 
-mydata = gsheet2tbl("https://docs.google.com/spreadsheets/d/1RSGUhjNpDH4HQHIyqTHH-yHXx3X4YfFH4tzN51Q_hRA/edit?usp=sharing")	
+mydata <- gsheet2tbl("https://docs.google.com/spreadsheets/d/1RSGUhjNpDH4HQHIyqTHH-yHXx3X4YfFH4tzN51Q_hRA/edit?usp=sharing")	
 
 
 # You can use the View() command to check that the data file is really assigned to the mydata object.	
 
 
-View(data)	
+View(mydata)	
 
 
 # # Types of objects	
@@ -260,8 +261,8 @@ is.logical(FALSE)
 
 as.character("I love R")	
 as.double(2L)	
-as.logical(0)	
-as.numeric("I love R")	
+as.logical(1)	
+as.numeric("12")	
 
 
 
@@ -286,7 +287,13 @@ is.vector(number)
 # When combining vectors with different types into one vector, the type is determined by a hierarchy of types:	
 
 
-numbers <- c(3, 4)	
+numbers1 <- c(3, 4)
+numbers2 <- c(4, 5)
+c(numbers1, numbers2)
+
+numbers <- c(3, 4)
+
+
 letter <- c("letter1", "abcd")	
 
 new_vector <- c(numbers, letter)	
