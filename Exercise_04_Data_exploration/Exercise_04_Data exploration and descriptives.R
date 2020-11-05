@@ -1,0 +1,735 @@
+############################################################
+#                                                          #
+#                     Data exploration                     #
+#                                                          #
+############################################################
+
+
+# This exercise will teach specific guidelines for exploring the distribution of data and the relationship of different types of variables.	
+
+# ## Load packages	
+
+# We will need the following packages in this exercise:	
+
+
+if (!require("gridExtra")) install.packages("gridExtra")	
+library(gridExtra) # for grid.arrange	
+if (!require("psych")) install.packages("psych")	
+library(psych) # for describe	
+if (!require("tidyverse")) install.packages("tidyverse")	
+library(tidyverse) # for dplyr and ggplot2	
+	
+	
+
+
+# ## Load data	
+
+# We will work with the latest COVID dataset published by the WHO as of today.	
+# We use the **read_csv()** to read the data. That function is the tidyverse counterpart of the previously encountered read.csv (which is a base R function). They work the same way, both read files with a .csv format. The only difference is the read_csv() creates a **tibble** format instead of the data.frame format. tibbles are data frames but they are slightly more processed, containing a bit more structural information about the dataset than the regular data.frame 	
+
+
+
+COVID_data <- read_csv("https://raw.githubusercontent.com/owid/covid-19-data/master/public/data/owid-covid-data.csv")	
+	
+
+
+# ## Data overview	
+
+# We should always start by getting an overall look at the dataset (we can print the data object, look at the dataset with View, or get some more structural information using the functions learned in the previous exercises.)	
+
+# Printing a **tibble object** shows more information than printing a simple data.frame. It basically shows the same information as if str() and head() was also run.	
+
+
+COVID_data	
+
+
+
+View(COVID_data)	
+
+
+# ## Descriptive statistics	
+
+# There are a number of functions dedicated to get descriptive statistics from datasets. One of the most commonly used ones is the **summary()** function, giving us information about the minimum and maximum values, the mean, the median, the kvartiles and missing data all at once.	
+
+# For example we can get descriptives from the variable "total cases" by using the code below: (note that we used the **select()** function to subset the dataset to only show descriptives for this one variable)	
+
+
+COVID_data %>% 	
+  select(total_cases) %>% 	
+  summary()	
+
+
+# Or we can get the same data for all of the variables, if we run the summary function on the whole dataset.	
+
+
+COVID_data %>% 	
+  summary()	
+
+
+# One thing you might notice during this initial exploration is that there are some extremely large numbers. If we look at the dataset, it is because the last rows contain aggregated "World" and "International" data. Let's exclude these rows from our dataset. **Note that we used "!" to indicate "NOT"**.	
+
+
+COVID_data <- COVID_data %>% 	
+  filter(location != "World", location != "International")	
+
+
+# *__________Practice____________* 	
+
+# - How many registered cases were there in total in Sweden on 2020.Nov.04 (*total_cases*)?	
+# - What was the highest value of registered new daily cases in Sweden during this pandemic (*new_cases*)?	
+
+# *______________________________*	
+
+
+# ## More descriptives!	
+
+# We can use the **describe()** function within the **Psych** package to get even more descriptive statistics such as skew and kurtosis which can be used to check the assumptions of some statistical tests about normality of distribution.	
+
+# One limitation of the describe function is that it primarily works for numerical, continuous data, and it returns warning messages when encountering categorical/nominal variables. So we exclude these categorical variables using the select() function, and only run the function below on the numerical data.	
+
+
+COVID_data %>% 	
+  select(-date, -iso_code, -continent, -location, -contains("tests"), -positive_rate) %>% 	
+  describe()	
+
+
+
+# *__________Practice____________* 	
+
+# - Check the skewness of the *new_cases_per_million* variable. (skewness values between 1 and -1 indicate a roughly normal distribution)	
+# - Check the number of valid cases in the dataset for the variable *gdp_per_capita* 	
+
+# *______________________________*	
+
+
+
+# ## Factors	
+
+# Lets meet a new vector class: **factor**. Factors are just like character vectors. They contain character strings as data. The main difference is that character vectors can contain any values as long as they are character values, while factors can only contain **specified values**. This means that we can set what are the valid values for a given factor, and this information can be used by certain functions.	
+
+# For example the variable **continent** can be set as a factor variable, since there are only certain values that are meaningful as "continents" in this dataset: (North America, Asia, Africa, Europe, South America, Oceania).	
+
+# We can use the **factor()** function to coerce a vector or variable to be a factor. R will automatically set the accepted values based on the unique values in the vector.	
+
+
+
+
+COVID_data <- COVID_data %>% 	
+              mutate(continent = factor(continent), 	
+                     location = factor(location))	
+	
+
+
+# The **levels()** function displays the levels (valid values) of the factor.	
+
+# When using the **table()** function we cen get a table of the number of cases within each level.	
+
+# When we simply print a factor, we will also get information about its levels.	
+
+
+levels(COVID_data$continent)	
+	
+table(COVID_data$continent)	
+	
+COVID_data$continent	
+
+
+# Now we create a daset that only contains the data published for the latest day (we use the max(COVID_data$date) code segment to determine the latest date in the dataset).	
+
+
+COVID_data_latest = COVID_data %>% 	
+  filter(date == max(COVID_data$date))	
+
+
+# After designating some varialbes as factors, the summary() function will display more information about it: It will display the frequency of cases within each factor level.	
+
+
+COVID_data_latest %>%	
+  select(continent) %>% 	
+  summary()	
+
+# Lets **exclude** oceania from our dataset using the **filter()** function to see how R reacts to losing all observations from one of the valid factor levels. 	
+
+# One thing to realize in this case is that R remembers all valid factor levels, even if all of the cases within that level are gone.	
+
+
+COVID_data_latest %>%	
+  filter(continent != "Oceania") %>% 	
+  select(continent) %>% 	
+  summary()	
+	
+
+
+# Sometimes, we don't want to keep remembering these factor levels. We can force R to remove factor levels that are no longer "in use" by any of the cases by using the **droplevels()**function. 	
+
+
+COVID_data_latest_noOceania = COVID_data_latest %>%	
+  filter(continent != "Oceania") %>% 	
+  mutate(continent = droplevels(continent))	
+	
+COVID_data_latest_noOceania %>% 	
+  select(continent) %>% 	
+  summary()	
+
+# ### Relation of factor levels	
+
+# So far we have worked with nominal variables, variables in which the factor levels are not ordered. However during data analysis we might encounter ordered categories, for example education level (no education < primary school < middleschool < highschool < higher education ...). This dataset does not contain such categorical variables, so let's create some:	
+
+# As we have seen earlier, we can use **case_when()** to designate categories based on values on a numerical variable. For example if we want to compare COVId statistics between countries with gdp_per_capita below 5000 with those with medium or high gdps. If we look at the distribution of gdp_per_capita we can see that the mode of the distribution is somewhere around 5000, but this is a very scewed distribution. 	
+
+
+
+	
+COVID_data_latest %>%	
+  select(gdp_per_capita, continent) %>% 	
+  drop_na() %>% 	
+  group_by(continent) %>% 	
+  summarize(mean_gdp = mean(gdp_per_capita))	
+	
+	
+COVID_data_latest %>%	
+  select(gdp_per_capita) %>% 	
+  drop_na() %>%	
+  ggplot() +	
+  aes(x = gdp_per_capita) +	
+  geom_density() + 	
+  geom_vline(xintercept = 5000, linetype="dashed", 	
+                color = "red", size=1.5)	
+	
+
+
+# So lets create a categorical variable based on this:	
+
+# Note that by using the factor() function we already designate this variable as a factor while it is being created.	
+
+
+
+COVID_data = COVID_data %>%	
+  mutate(gdp_per_capita_kat = factor(	
+                                      case_when(gdp_per_capita < 5000 ~ "small",	
+                                                gdp_per_capita >= 5000 & gdp_per_capita < 10000 ~ "medium",	
+                                                gdp_per_capita > 10000 ~ "large")))	
+levels(COVID_data$gdp_per_capita_kat)	
+	
+# ugyanez a COVID_data_latest -al	
+	
+COVID_data_latest = COVID_data_latest %>%	
+  mutate(gdp_per_capita_kat = factor(	
+                                      case_when(gdp_per_capita < 5000 ~ "small",	
+                                                gdp_per_capita >= 5000 & gdp_per_capita < 10000 ~ "medium",	
+                                                gdp_per_capita > 10000 ~ "large")))	
+
+
+
+# When we plot the data using ggplot (using the geom_bar for a barchart), we can see that the factor levels are displaysed as "large", "medium", and "small", from left to right. 	
+
+
+
+COVID_data_latest %>%	
+  ggplot() +	
+  aes(x = gdp_per_capita_kat) +	
+  geom_bar()	
+	
+
+
+# This might seem a little off at first sight, since we usually display things in an ascending order from left to right, so "small" might be expected to be displayed at the left side of the graph. The reason for R using this display sequence is that R orders the factor levels by default based on **alphabetical order**.	
+
+# We can change the order in which factor levels are listed and displayed by R by forcing this order. Within the factor() we can list the levels in the desired order using the **levels = c()** parameter.	
+
+
+COVID_data_latest = COVID_data_latest %>%	
+mutate(gdp_per_capita_kat = factor(gdp_per_capita_kat, levels = c(	
+                                          "small",	
+                                           "medium",	
+                                           "large")))	
+	
+COVID_data_latest %>%	
+  ggplot() +	
+  aes(x = gdp_per_capita_kat) +	
+  geom_bar()	
+	
+
+# We can also specify to R that this factor is an ordinal (ordered) factor, in which case, R will recodnise the hierarchy/order of the factor levels, and can use this information in certain statistical tests. This can be done by using the , **ordered = T** paramater.	
+
+# If we do this, notice that when listing this vector R will put relation signs between the factor levels.	
+
+
+COVID_data_latest = COVID_data_latest %>%	
+mutate(gdp_per_capita_kat = factor(gdp_per_capita_kat, ordered = T, levels = c(	
+                                          "small",	
+                                           "medium",	
+                                           "large")))	
+COVID_data_latest$gdp_per_capita_kat	
+	
+
+
+
+
+
+# *________Practice___________* 	
+
+# - Filter the dataset so that we only work with data from 2020-09-28 and save it as a new object. 	
+# - Create a new categorical variable (called *new_cases_per_million_kat*) with countries with *new_cases_per_million* under 20 coded as "small", and countries with *new_cases_per_million* 20 or above coded as "large". 	
+# - Pay attention to designate this new variable as factor.	
+# - Save this new variable into the data object so that we can work with this variable later.	
+# - Create a table showing the number of observations belonging to each factor level.	
+# - Designate the correct oder of the factor levels: small, large (make sure that this is saved into the original data object as well)	
+# - Check whether the factor levels are displayed in the right order.	
+
+# *______________________________*	
+
+
+# ## Exploration through visualization	
+
+# Before data analysis we should always do explorative analysis of the data to get a picture of the data we are working with, and to identify errors. One of the main tools for exploration is visualization. 	
+
+# ### Visualizing univariate distributions and frequencies	
+
+# When visualizing variables, one of the main considerations when choosing the plot type to sue is the type of the data we are working with.	
+
+# The distribution (frequencies) of categorical variables is most often visualized using barcharts (**geom_bar**).	
+
+
+COVID_data_latest %>%	
+ggplot() +	
+  aes(x = continent) +	
+  geom_bar()	
+	
+
+
+
+# While the distribution of continuous variables are usually plotted using historgrams or density plots. 	
+
+
+COVID_data_latest %>%	
+ggplot() +	
+  aes(x = total_deaths_per_million) +	
+  geom_histogram()	
+	
+	
+COVID_data_latest %>%	
+ggplot() +	
+  aes(x = total_deaths_per_million) +	
+  geom_density()	
+	
+
+
+
+# *________Practice___________* 	
+
+# - filter the COVID dataset so that we only work with data from 2020-09-07.	
+# - Using the previously learned methods to explore the univariate distributions and identify potential errors or unexplected values in the dataset.	
+# - Aside from visualization you can also use the View(), summary(), and descibe() functions to get data about the minimum and maximum values and number of valid cases.	
+# - For numerical data it is a good starting point to look at the minimal and maximal values for error detection.	
+# - For categorcial variables it is a good idea to look at the number of observations belonging to each factor level.	
+
+# *______________________________*	
+
+
+# ## Correcting errors	
+
+
+# We can use the **mutate()** and **replace()** functions to correct incorrectly entered values. 	
+
+# It is always a good idea to save the corrected data into a **new data object**, so the raw data is kept in an unmanipulated way. This can come in handy when you want to report the original (replaced) values in a paper or research report, or if you change your mind and want to use a different approach to handle the error.	
+
+
+
+	
+COVID_data_corrected <- COVID_data %>%	
+  mutate(new_cases = replace(new_cases,  new_cases=="-8261", NA))	
+	
+
+
+# It is important when replacing or recoding values to **double check** that the replacement/recode worked as intended. Below we check this using visualization. The raw original data is displayed on the left hand side panel, while the corrected data is shown on the right. 	
+
+# Notice how we use the **grid.arrange()** function from the gridExtra package to put these two plots side-by-side.	
+
+
+# hasznalhatnak meg az alabbiakat is arra, 	
+# hogy megbizonyosodjunk abban, hogy sikeres volt a csere	
+# View(COVID_data_corrected)	
+# describe(COVID_data_corrected)	
+# summary(COVID_data_corrected$szocmedia_3)	
+# COVID_data_corrected$szocmedia_3	
+	
+old_plot <-	
+  COVID_data %>% 	
+  filter(date == "2020-09-07", new_cases < 1000) %>% 	
+  ggplot()+	
+    aes(x = new_cases)+	
+    geom_histogram()	
+	
+new_plot <-	
+  COVID_data_corrected %>% 	
+  filter(date == "2020-09-07", new_cases < 1000) %>% 	
+  ggplot()+	
+    aes(x = new_cases)+	
+    geom_histogram()	
+	
+	
+grid.arrange(old_plot, new_plot, ncol=2)	
+	
+
+
+
+
+# ## Exploring the relationship of multiple variables	
+
+# We can use tables and plots to explore the relationship of two variables before running statistical test. Visualization and running these exploratory tables is always recommended before running the actual statistical tests.	
+
+# ### Exploring the relationship of two categorcial variables	
+
+# **Exploratory analysis**	
+
+# Now lets explore the relationship between the categorical varialbe we created for GDP (*gdp_per_capita_kat*), and the continent (*continent*). Lets use the data only from the latest day in the dataset.	
+
+# The easiest was to get descriptive data of the relationship of two categorical variables is to produce a **crosstab** using the **table()** function.	
+
+
+
+	
+table(COVID_data_latest$gdp_per_capita_kat, COVID_data_latest$continent)	
+	
+	
+
+# This table shows that most of the small income countries are located in Africa, while most of the large income countries are located in Europe.	
+
+# We can also use a barchart to visualize this relationship with **geom_bar()**.	
+
+# One of the methods is to use a **stacked bar chart**, which cna be created using **geom_bar()**. Since barcharts only accept vairalbe on the x axis, we can use the **"fill = "** parameter to add another variable element in the aes() function.	
+
+
+
+	
+COVID_data_latest %>%	
+ggplot() +	
+  aes(x = continent, fill = gdp_per_capita_kat) +	
+  geom_bar()	
+	
+
+# If the number of observations is very different for the different factor levels, the stacked barchart can be misleading or uninformative. So it is often useful to create different barcharts as well, for example a stacked barchart with y representing proportions instead of raw frequencies (use **position = "fill"** parameter within geom_bar() to achieve this.), or a dodged barchart (use **position = "dodge"** parameter within geom_bar() to achieve this).	
+
+
+
+	
+COVID_data_latest %>%	
+ggplot() +	
+  aes(x = continent, fill = gdp_per_capita_kat) +	
+  geom_bar(position = "fill")	
+	
+COVID_data_latest %>%	
+ggplot() +	
+  aes(x = continent, fill = gdp_per_capita_kat) +	
+  geom_bar(position = "dodge")	
+	
+
+
+
+# *___________Practice___________* 	
+
+
+# Use the methods learned above to explore the relationship of **new_cases_per_million_kat** (created in the practice exercise above) and **continent** in the COVID_data_latest dataset.	
+# - use the **geom_bar()** geom for visualization	
+# - use different types of barcharts to give a more detailed picture of the relationship of the two variables.	
+# - What conclusion can we arrive at by looking at the plots? 	
+
+# *______________________________*	
+
+
+	
+# If you havent created this variable yet, you can create the new_cases_per_million_kat variable in the following way:	
+	
+COVID_data = COVID_data %>%	
+  mutate(new_cases_per_million_kat = factor(	
+                                      case_when(new_cases_per_million < 20 ~ "small",	
+                                                new_cases_per_million >= 20 ~ "large"), ordered = T, levels = c("small", "large")))	
+	
+levels(COVID_data$new_cases_per_million_kat)	
+	
+# The same for the COVID_data_latest dataset:	
+	
+COVID_data_latest = COVID_data_latest %>%	
+  mutate(new_cases_per_million_kat = factor(	
+                                      case_when(new_cases_per_million < 20 ~ "small",	
+                                                new_cases_per_million >= 20 ~ "large"), ordered = T, levels = c("small", "large")))	
+
+
+# We can control how and where the plot legend is displayed using the theme(legend.position) and the guides() functions. This can improve the interpretability of the plot.	
+
+
+
+	
+	
+barchart_plot_3 <- 	
+COVID_data_latest %>%	
+  select(new_cases_per_million_kat, gdp_per_capita_kat) %>% 	
+  drop_na() %>% 	
+ggplot() +	
+  aes(x = new_cases_per_million_kat, fill = gdp_per_capita_kat) +	
+  geom_bar()	
+  	
+	
+barchart_plot_4 <- 	
+COVID_data_latest %>%	
+  select(new_cases_per_million_kat, gdp_per_capita_kat) %>% 	
+  drop_na() %>% 	
+ggplot() +	
+  aes(x = new_cases_per_million_kat, fill = gdp_per_capita_kat) +	
+  geom_bar(position = "fill") +	
+  ylab("proportion")	
+	
+grid.arrange(barchart_plot_3, barchart_plot_4, ncol=2)	
+	
+	
+	
+# a theme(legend.position) es a guides() funciok 	
+# hasznalataval kontrollalhatjuk hogy hol es hogyan 	
+# jelenjen meg a jelmagyarazat az abran	
+	
+barchart_plot_3 <- 	
+COVID_data_latest %>%	
+  select(new_cases_per_million_kat, gdp_per_capita_kat) %>% 	
+  drop_na() %>% 	
+ggplot() +	
+    aes(x = new_cases_per_million_kat, fill = gdp_per_capita_kat) +	
+    geom_bar() +	
+    theme(legend.position="bottom") +	
+    guides(fill = guide_legend(title.position = "bottom"))	
+  	
+	
+barchart_plot_4 <- 	
+COVID_data_latest %>%	
+  select(new_cases_per_million_kat, gdp_per_capita_kat) %>% 	
+  drop_na() %>% 	
+ggplot() +	
+  aes(x = new_cases_per_million_kat, fill = gdp_per_capita_kat) +	
+  geom_bar(position = "fill") +	
+  theme(legend.position="bottom") +	
+  guides(fill = guide_legend(title.position = "bottom")) +	
+  ylab("proportion")	
+	
+grid.arrange(barchart_plot_3, barchart_plot_4, ncol=2)	
+	
+
+
+
+# Yet another way of displaying plots of multiple variables is to put them on separate plot panels. We can use the **facet_wrap()** function to create this faceted (**multi-panel**) plot like in the example below: 	
+
+
+
+	
+barchart_plot_6 <- 	
+COVID_data_latest %>%	
+  select(new_cases_per_million_kat, gdp_per_capita_kat) %>% 	
+  drop_na() %>% 	
+ggplot() +	
+  aes(x = gdp_per_capita_kat) +	
+  geom_bar() +	
+  facet_wrap(~ new_cases_per_million_kat)	
+	
+barchart_plot_6	
+	
+
+
+
+
+# ### Exploring the relationship if a categorical and a continuous variable	
+
+# Lets explore gdp_per_capita on the different continents. In this case we will use gdp_per_capita as a continuous variable, and we would like to assess its relationship with a categoricl variable: continent.	
+
+# We can start the exploration by producing descriptive tables. As we have learned earlier, this ispossible by using the combination of **group_by()** amd **summarize()** functions. There are also some countries with no data about gdp, so in order to get means and standard deviations we will need to drop these cases from the dataset using the **drop_na()** function.	
+
+# We can do all this within one code chain using the pipe operator. 	
+
+# The summary table shows that the average gdp per capita in Africa is 5444, while in Europe it is 32750.	
+
+
+
+COVID_data_latest %>%	
+  select(continent, gdp_per_capita) %>% 	
+  drop_na() %>% 	
+  group_by(continent) %>% 	
+    summarize(mean = mean(gdp_per_capita),	
+              sd = sd(gdp_per_capita))	
+	
+
+
+# Lets **visualize** this same relationship now.	
+
+# We have multipl options to choose from.	
+
+# - we can us **facet_wrap()** and apply **geom_histogram()** or **geom_dotplot()**	
+# - one of the most common solutions is to use **geom_boxplot()**	
+# - we can also use **geom_density()** with colors representing the different continents. 	
+# - my favorite solution is the **geom_violin()**, combined with **geom_jitter()**	
+
+# We can use multiple types of plots to get a more complex picture of the relationship.	
+
+
+
+	
+COVID_data_latest %>%	
+  select(continent, gdp_per_capita) %>% 	
+  drop_na() %>%	
+  ggplot() +	
+    aes(x = gdp_per_capita) +	
+    geom_histogram() +	
+    facet_wrap(~ continent)	
+
+
+
+	
+COVID_data_latest %>%	
+  select(continent, gdp_per_capita) %>% 	
+  drop_na() %>%	
+  ggplot() +	
+    aes(x = gdp_per_capita) +	
+    geom_dotplot() +	
+    facet_wrap(~ continent)	
+	
+
+
+
+	
+COVID_data_latest %>%	
+  select(continent, gdp_per_capita) %>% 	
+  drop_na() %>%	
+  ggplot() +	
+    aes(x = continent, y = gdp_per_capita) +	
+    geom_boxplot()	
+	
+
+
+
+	
+COVID_data_latest %>%	
+  select(continent, gdp_per_capita) %>% 	
+  drop_na() %>%	
+  ggplot() +	
+    aes(x = gdp_per_capita, fill = continent) +	
+    geom_density(alpha = 0.3)	
+	
+COVID_data_latest %>%	
+  select(continent, gdp_per_capita) %>% 	
+  drop_na() %>%	
+  ggplot() +	
+    aes(x = gdp_per_capita, fill = continent) +	
+    geom_density()+	
+  facet_wrap(~continent)	
+	
+
+
+
+
+	
+COVID_data_latest %>%	
+  select(continent, gdp_per_capita) %>% 	
+  drop_na() %>%	
+  ggplot() +	
+    aes(x = continent, y = gdp_per_capita, fill = continent) +	
+    geom_violin() +	
+    geom_jitter(width = 0.1)	
+
+# The plots add to the picture previously seen in the descriptive table. It seems that even though the average gdp in Asia is not as low as in Africa, this is partly due to a few **extreme cases** that probably have a high influence on the mean.	
+
+# Due to this realization we might want to trim the cases with very high gdp values to get a more realistic picture about the descriptive statistics of each continent. We can insert the **filter()** function int hte previous code chuncks to do this trimming.	
+
+
+
+	
+COVID_data_latest %>%	
+  select(continent, gdp_per_capita) %>% 	
+  drop_na() %>%	
+  filter(gdp_per_capita < 50000) %>% 	
+    ggplot() +	
+      aes(x = continent, y = gdp_per_capita) +	
+      geom_violin() +	
+      geom_jitter(width = 0.1)	
+	
+COVID_data_latest %>%	
+  select(continent, gdp_per_capita) %>% 	
+  drop_na() %>%	
+  filter(gdp_per_capita < 50000) %>% 	
+    group_by(continent) %>% 	
+      summarize(mean = mean(gdp_per_capita),	
+                sd = sd(gdp_per_capita))	
+	
+
+# We can take more valiralbes into account while plotting by using the facet_wrap() and facet_grid() functions.	
+
+# *___________Practice___________* 	
+
+
+# - Use the above learned techniques to explore the relationship of **total_cases_per_million** and **gdp_per_capita_kat** in the COVID_data_latest dataset.	
+
+# *______________________________*	
+
+
+# ### Exploring the relationship of two numerical variables	
+
+# We ususally use the **correlation** coefficient to discribe the relationship between **two continuous variables**.	
+
+# The **cor()** function is can be used to get the correlation coefficient. (note that we need to use the **drop_na()** function again to drop cases with missing data, otherwise the cor() function will return on NAs).	
+
+
+
+	
+	
+COVID_data_latest %>%	
+  select(new_cases_per_million, gdp_per_capita) %>% 	
+  drop_na() %>%	
+      cor()	
+	
+	
+COVID_data_latest %>%	
+  select(new_cases_per_million, gdp_per_capita, hospital_beds_per_thousand) %>% 	
+  drop_na() %>%	
+      cor()	
+	
+
+
+# We usually use scatterplots (**geom_point()**) to **visualize** relationship between two continuous variables.	
+
+# The **geom_smooth()** layer can also provide additional insight about the underlying relationship between the two variables. When using geom_smooth, the blue line represents the "trend line" or "regression line", while the grey area shows the confidence interval for this prediction line.	
+
+
+	
+COVID_data_latest %>%	
+  select(hospital_beds_per_thousand, gdp_per_capita) %>% 	
+  drop_na() %>%	
+  ggplot() +	
+    aes(x = hospital_beds_per_thousand, y = gdp_per_capita) +	
+    geom_point()	
+	
+COVID_data_latest %>%	
+  select(hospital_beds_per_thousand, gdp_per_capita) %>% 	
+  drop_na() %>%	
+  ggplot() +	
+    aes(x = hospital_beds_per_thousand, y = gdp_per_capita) +	
+    geom_point() +	
+    geom_smooth() 	
+
+
+# *___________Practice___________* 	
+
+# Explore the relationship between aged_70_older and gdp_per_capita in the COVID_data_latest.	
+
+# - determine the correlation coefficient	
+# - visualize the relationship	
+
+
+# *______________________________*	
+
+# When exploring the relationship of three continuous variables we can use graded color as a new aesthetic for the third variable, just like in the example below: 	
+
+
+COVID_data_latest %>%	
+  select(hospital_beds_per_thousand, gdp_per_capita, aged_70_older) %>% 	
+  drop_na() %>%	
+  ggplot() +	
+    aes(x = hospital_beds_per_thousand, y = gdp_per_capita, col = aged_70_older) +	
+    geom_point()+ 	
+  scale_colour_gradientn(colours=c("green","black"))	
+	
+
