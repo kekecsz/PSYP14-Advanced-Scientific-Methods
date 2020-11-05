@@ -15,7 +15,7 @@
 # Note that after running this code the "movies" data shows up in the workspace.	
 
 
-movies <- read.csv("https://raw.githubusercontent.com/kekecsz/PSYP14-Advanced-Scientific-Methods/main/movies.csv")	
+movies <- read.csv("https://raw.githubusercontent.com/kekecsz/PSYP14-Advanced-Scientific-Methods/main/Exercise_03_Data_visualization/movies.csv")	
 
 
 # Lets do a basic overview of the dataset usign the methods we learned earlier.	
@@ -180,7 +180,7 @@ movies %>%
   ggplot() + 	
   aes(x = thtr_rel_year,	
       y = audience_score) +	
-  geom_point(shape=16, fill = "white", size = 5)	
+  geom_point(shape=21, fill = "white", size = 5)	
 
 
 
