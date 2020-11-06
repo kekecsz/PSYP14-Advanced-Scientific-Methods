@@ -12,11 +12,8 @@
 # We will need the following packages in this exercise:	
 
 
-if (!require("gridExtra")) install.packages("gridExtra")	
 library(gridExtra) # for grid.arrange	
-if (!require("psych")) install.packages("psych")	
 library(psych) # for describe	
-if (!require("tidyverse")) install.packages("tidyverse")	
 library(tidyverse) # for dplyr and ggplot2	
 	
 	
@@ -416,8 +413,11 @@ ggplot() +
 COVID_data_latest %>%	
 ggplot() +	
   aes(x = continent, fill = gdp_per_capita_kat) +	
-  geom_bar(position = "fill")	
+  geom_bar(position = "fill")	+
+  ylab("proportions")
 	
+
+
 COVID_data_latest %>%	
 ggplot() +	
   aes(x = continent, fill = gdp_per_capita_kat) +	

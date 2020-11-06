@@ -3,8 +3,8 @@ title: "Data exploration and descriptives"
 author: "Zoltan Kekecs"
 date: "November 04, 2020"
 output:
-  pdf_document: default
   html_document: default
+  pdf_document: default
   word_document: default
 ---
 
@@ -21,11 +21,8 @@ This exercise will teach specific guidelines for exploring the distribution of d
 We will need the following packages in this exercise:
 
 ```{r packages, echo=T, results='hide', message=F, warning=F}
-if (!require("gridExtra")) install.packages("gridExtra")
 library(gridExtra) # for grid.arrange
-if (!require("psych")) install.packages("psych")
 library(psych) # for describe
-if (!require("tidyverse")) install.packages("tidyverse")
 library(tidyverse) # for dplyr and ggplot2
 
 
@@ -417,6 +414,7 @@ ggplot() +
   geom_bar()
 
 ```
+
 If the number of observations is very different for the different factor levels, the stacked barchart can be misleading or uninformative. So it is often useful to create different barcharts as well, for example a stacked barchart with y representing proportions instead of raw frequencies (use **position = "fill"** parameter within geom_bar() to achieve this.), or a dodged barchart (use **position = "dodge"** parameter within geom_bar() to achieve this).
 
 
@@ -425,7 +423,8 @@ If the number of observations is very different for the different factor levels,
 COVID_data_latest %>%
 ggplot() +
   aes(x = continent, fill = gdp_per_capita_kat) +
-  geom_bar(position = "fill")
+  geom_bar(position = "fill") +
+  ylab("proportion")
 
 COVID_data_latest %>%
 ggplot() +
