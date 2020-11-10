@@ -43,7 +43,7 @@ library(tidyverse) # for dplyr and ggplot2
 successes = rbinom(n = 10000, size = 10, prob = 0.5)	
 random_flips = data.frame(successes)	
 	
-sum(successes > 9)/10000 # proportion of experiments with 9 or more "heads"	
+sum(successes > 8)/10000 # proportion of experiments with 9 or more "heads"	
 	
 ggplot(data = random_flips) +	
   aes(x = successes) +	
