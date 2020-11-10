@@ -206,7 +206,7 @@ data = data %>%
 	
 
 
-# The data simlate data gathered in a randomized controlled clinical trial, where we assessed the effectiveness of psychotherapy to alleviate stress of hurricane survivors. People with high anxiety entered the study after they lost their homes in a hurricane. Participants were randomly allocated into a control or a treatment group. The treatment group got weekly CBT sessions for 6 weeks. The control group was put on a wait list, and did not get any intervention to decrease anxiety.	
+# The data simulate data gathered in a randomized controlled clinical trial, where we assessed the effectiveness of psychotherapy to alleviate stress of hurricane survivors. People with high anxiety entered the study after they lost their homes in a hurricane. Participants were randomly allocated into a control or a treatment group. The treatment group got weekly CBT sessions for 6 weeks. The control group was put on a wait list, and did not get any intervention to decrease anxiety.	
 
 # In the dataset we have the following variableS: 	
 
@@ -250,7 +250,7 @@ data %>%
 set.seed(Sys.time())	
 
 
-# ## Hipotezisek	
+# ## Hypotheses
 
 # We will test the following hypotheses in this study: 	
 
@@ -398,7 +398,7 @@ mean_dif
 
 # The result can be written down as follows:	
 
-# "Man and women are significantly different in post-treatment anxiety. (t = `r round(t_test_results$statistic, 2)`, df = `r round(t_test_results$parameter, 2)`, p = `r round(t_test_results$p.value, 3)`. Mean anxiety in the groups were as follows: women: `r round(summary$mean[1], 2)`(`r round(summary$sd[1], 2)`), men: `r round(summary$mean[2], 2)`(`r round(summary$sd[2], 2)`). Women were on average more anxious by `r round(mean_dif, 2)` points than men (95% CI = `r round(t_test_results$conf.int[1], 2)`, `r round(t_test_results$conf.int[2], 2)`)."	
+# "Men and women are significantly different in post-treatment anxiety. (t = `r round(t_test_results$statistic, 2)`, df = `r round(t_test_results$parameter, 2)`, p = `r round(t_test_results$p.value, 3)`. Mean anxiety in the groups were as follows: women: `r round(summary$mean[1], 2)`(`r round(summary$sd[1], 2)`), men: `r round(summary$mean[2], 2)`(`r round(summary$sd[2], 2)`). Women were on average more anxious by `r round(mean_dif, 2)` points than men (95% CI = `r round(t_test_results$conf.int[1], 2)`, `r round(t_test_results$conf.int[2], 2)`)."	
 
 # ### One-way ANOVA	
 
@@ -495,9 +495,7 @@ t_test_results_one_sided
 
 # *____________Practice___________*	
 
-# Test the 3rd hypothesis mentioned above: 	
-
-# Teszteld a 3. hipotezist, hogy "The average anxiety will be lower i the treatment group than in the control group at the 6 week (post-tretatment) measurement time" (**anxiety_post** vs. **group**).	
+# Test the 3rd hypothesis mentioned above: "The average anxiety will be lower in the treatment group than in the control group at the 6 week (post-tretatment) measurement time" (**anxiety_post** vs. **group**).	
 
 # - Lets run exporatory analyses on the relationship of the two variables	
 # - Decide whether to use one or two sided test, and if you decide to use one-sided, make sure to specify the alternative correctly based on what is the reference group	
@@ -512,6 +510,7 @@ t_test_results_one_sided
 # The **correlation test** determines whether there is a statistically significant relationship between **two conitnuous variables**	
 
 # The assumptions of pearson's correlation are:	
+
 # - Continuous variables. If one or both of the variables are ordinal in measurement, then a Spearman correlation can be used	
 # - Each observation should have a pair of values	
 # - Absence of outliers	
@@ -564,9 +563,7 @@ correlation_result_greater
 
 # *____________Practice____________*	
 
-# test the 4th hypothesis mentioned above: 	
-
-# Teszteld a 4. hipotezist, hogy "Resilience will be negatively correlated with post-test anxiety (those with higher resilience will have lower anxiety)." (**anxiety_post** vs. **resilience**)	
+# Test the 4th hypothesis mentioned above: "Resilience will be negatively correlated with post-test anxiety (those with higher resilience will have lower anxiety)." (**anxiety_post** vs. **resilience**)	
 
 # - Lets run exporatory analyses on the relationship of the two variables	
 # - Decide whether to use one or two sided test, and if you decide to use one-sided, make sure to specify the alternative correctly based on the expected direction of the relationship	
