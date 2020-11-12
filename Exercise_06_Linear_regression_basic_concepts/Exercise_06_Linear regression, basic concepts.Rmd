@@ -70,7 +70,7 @@ You can load the data we just collected with the following code
 ```{r load data, message=FALSE}
 # alternative download link: https://raw.githubusercontent.com/kekecsz/PSYP13_Data_analysis_class-2018
 # /master/Shoe%20and%20height%20data%20PSYP13-HT18.csv
-mydata = as_tibble(read.csv("https://bit.ly/2Q0qZgP"))
+mydata = as_tibble(read.csv("https://tinyurl.com/shoesize-data-1"))
 ```
 
 ## Check the dataset for irregularities
@@ -92,38 +92,21 @@ mydata %>%
   summary()
 ```
 
-
-There are several irregularties in the dataset, such as the height is a characer vector, and has some weird values, and also the variable 'gender' has inconsistency in coding. We need to handle these before going forward.
-
-```{r cleaning data}
-mydata_cleaned <- mydata %>% 
-  mutate(
-    height = replace(height, height == "168cm", 168),
-    height = replace(height, height == "64", 164),
-    height = as.numeric(height),
-    gender = replace(gender, gender == "Female", "female"),
-    gender = factor(replace(gender, gender == "Male", "male"))
-    )
-mydata_cleaned %>% 
-  summary()
-
-```
-
 Visualization is also key in checking and exploring data.
 
 ```{r check data 3}
 
-mydata_cleaned %>% 
+mydata %>% 
   ggplot() +
   aes(x = height) +
   geom_histogram()
 
-mydata_cleaned %>% 
+mydata %>% 
   ggplot() +
   aes(x = shoe_size) +
   geom_histogram()
 
-mydata_cleaned %>% 
+mydata %>% 
   ggplot() +
   aes(y = shoe_size, x = height) +
   geom_point()
@@ -138,17 +121,17 @@ mydata_cleaned %>%
 Regression is all about predicting or etimating an outcome by knowing the value of predictor variables that are associated with the outcome.
 
 You can set up a simple regression model by using the code below.
-In the code we first specify an object where the results will be saved (mod1), then we specify the regression formula. In the formula, we start with specifying the outcome variable, what we are interested in predicting (shoe_size), then, after a ~ we specify the predictors. In simple regresison we only have one predictor (here this is height), but we could add more predictor variables, spearated with a + sign. In the end of the code we specify the data file where these variables originate from. Remember to use the cleaned dataset (mydata_cleaned).
+In the code we first specify an object where the results will be saved (mod1), then we specify the regression formula. In the formula, we start with specifying the outcome variable, what we are interested in predicting (shoe_size), then, after a ~ we specify the predictors. In simple regresison we only have one predictor (here this is height), but we could add more predictor variables, spearated with a + sign. In the end of the code we specify the data file where these variables originate from. Remember to use the cleaned dataset (mydata).
 
 
 ```{r simple regression model}
-mod1 <- lm(shoe_size ~ height, data = mydata_cleaned)
+mod1 <- lm(shoe_size ~ height, data = mydata)
 ```
 
 In simple regression, we identifies the underlying pattern of the data, by fitting a single straight line that is closest to all data points.
 
 ```{r, regression line}
-mydata_cleaned %>% 
+mydata %>% 
   ggplot() +
   aes(x = height, y = shoe_size) +
   geom_point() +
@@ -189,7 +172,7 @@ Predicted values all fall on the regression line
 
 ```{r predictions on regression line}
 
-mydata_cleaned %>% 
+mydata %>% 
   ggplot() +
   aes(x = height, y = shoe_size) +
   geom_point() +
@@ -229,10 +212,10 @@ You can simply add up all the residual error (the length of these lines), and ge
 
 
 ```{r RSS}
-RAD = sum(abs(mydata_cleaned$shoe_size - predict(mod1)))
+RAD = sum(abs(mydata$shoe_size - predict(mod1)))
 RAD
 
-RSS = sum((mydata_cleaned$shoe_size - predict(mod1))^2)
+RSS = sum((mydata$shoe_size - predict(mod1))^2)
 RSS
 ```
 
@@ -245,11 +228,11 @@ Below you can find regression model where we only use the mean of the outcome va
 We can calculate the sum of squared differences the same way as before, but for the model without any predictors, we call this the total sum of squared differences (TSS).
 
 ```{r TSS}
-mod_mean <- lm(shoe_size ~ 1, data = mydata_cleaned)
+mod_mean <- lm(shoe_size ~ 1, data = mydata)
 
 error_plotter(mod_mean, col = "red", x_var = "height") # visualize error
 
-TSS = sum((mydata_cleaned$shoe_size - predict(mod_mean))^2)
+TSS = sum((mydata$shoe_size - predict(mod_mean))^2)
 TSS
 ```
 
@@ -291,7 +274,7 @@ You can also plot the confidence interval of the predictions using geom_smooth()
 
 ```{r plot confidence interval}
 
-mydata_cleaned %>% 
+mydata %>% 
   ggplot() +
   aes(x = height, y = shoe_size)+
   geom_point()+
