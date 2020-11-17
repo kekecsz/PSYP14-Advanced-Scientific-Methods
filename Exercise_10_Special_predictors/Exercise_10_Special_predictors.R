@@ -39,10 +39,10 @@ data_weightloss = read_csv("https://tinyurl.com/weightloss-data")
 # - BMI_post_treatment - Body mass index (BMI) measured after treatment	
 # - treatment_type - The type of treatment in the group to which the participant was randomized to. Levels:	
 	
-1. no treatment	
-2. pill - medication which lowers apetite	
-3. psychotherapy - cognitive behavioral therapy	
-4. treatment 3 - a third kind of treatment (see below) 	
+# 1. no treatment	
+# 2. pill - medication which lowers apetite	
+# 3. psychotherapy - cognitive behavioral therapy	
+# 4. treatment 3 - a third kind of treatment (see below) 	
 
 # - motivation - self report motivation to lose weight (on a 0-10 scale from extremely low motivation to extremely high motivation)	
 # - body_acceptance - how much the person feels that he or she is satisfied with his or her body. (on a scale of -7 to +7 from very unsatisfied to very satisfied)	
