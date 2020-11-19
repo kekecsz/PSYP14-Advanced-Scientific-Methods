@@ -36,7 +36,6 @@ library(r2glmm) # for r2beta
 library(lme4) # for lmer
 library(lmerTest) # to get singificance test in lmer
 library(MuMIn) # for r.squaredGLMM
-library(optimx) # for optimx optimizer
 ```
 
 
